@@ -1,18 +1,19 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const sequelize = require("./config/database");
-const Listing = require("./models/Listing");
+const sequelize = require("./config/database"); // Assuming your sequelize configuration is correct
+const Listing = require("./models/Listing"); // Import the Listing model for seeding
+const listingRoutes = require("./routes/listingRoutes"); // Import the routes
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Sync database
+// Sync database and optionally seed data in dev environment
 sequelize.sync({ force: true }).then(() => {
   console.log("Database synced");
 
-  // Seed example data
+  // Optionally seed example data only in development environment
   Listing.bulkCreate([
     {
       title: "Luxury Apartment",
@@ -31,28 +32,8 @@ sequelize.sync({ force: true }).then(() => {
   ]);
 });
 
-// API routes
-app.get("/api/listings", async (req, res) => {
-  const listings = await Listing.findAll();
-  res.json(listings);
-});
-
-app.post("/api/inquiries", (req, res) => {
-  console.log("Inquiry received:", req.body);
-  res.json({ message: "Inquiry sent!" });
-});
-
-// Add this route to fetch a listing by ID
-app.get("/api/listings/:id", async (req, res) => {
-  const { id } = req.params;
-  const listing = await Listing.findByPk(id);
-
-  if (!listing) {
-    return res.status(404).json({ message: "Listing not found" });
-  }
-
-  res.json(listing);
-});
+// Use routes
+app.use("/api/listings", listingRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
