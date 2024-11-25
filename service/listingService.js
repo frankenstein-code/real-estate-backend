@@ -24,6 +24,7 @@ const getListingById = async (id) => {
 
 const handleInquiry = async (inquiryData) => {
   try {
+    console.log("inquiryData", inquiryData);
     // This is a placeholder; you can implement actual email sending logic here.
     console.log("Inquiry received:", inquiryData);
     return { message: "Inquiry sent!" };
