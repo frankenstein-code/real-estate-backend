@@ -1,9 +1,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const sequelize = require("./config/database"); // Assuming your sequelize configuration is correct
-const Listing = require("./models/Listing"); // Import the Listing model for seeding
-const listingRoutes = require("./routes/listingRoutes"); // Import the routes
+const sequelize = require("./config/database");
+const Listing = require("./models/Listing");
+const listingRoutes = require("./routes/listingRoutes");
+const seedData = require("./seeder/listingSeeder");
 
 const app = express();
 app.use(cors());
@@ -14,22 +15,13 @@ sequelize.sync({ force: true }).then(() => {
   console.log("Database synced");
 
   // Optionally seed example data only in development environment
-  Listing.bulkCreate([
-    {
-      title: "Luxury Apartment",
-      description: "A spacious apartment in the city center.",
-      price: 250000,
-      location: "New York",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      title: "Beach House",
-      description: "A beautiful house near the beach.",
-      price: 500000,
-      location: "California",
-      image: "https://via.placeholder.com/150",
-    },
-  ]);
+  Listing.bulkCreate(seedData)
+    .then(() => {
+      console.log("Seed data successfully added!");
+    })
+    .catch((error) => {
+      console.error("Error adding seed data:", error);
+    });
 });
 
 // Use routes
